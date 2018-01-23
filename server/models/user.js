@@ -18,7 +18,7 @@ var UserSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    require: true,
+    required: true,
     minlength: 6
   },
   tokens: [{
@@ -31,7 +31,7 @@ var UserSchema = new mongoose.Schema({
       required: true
     }
   }]
-});
+},{ usePushEach : true});
 
 //overwriting the inbuilt instance method toJSON()
 UserSchema.methods.toJSON = function() {
@@ -46,7 +46,7 @@ UserSchema.methods.generateAuthToken = function() {
   var access = 'auth';
   var token = jwt.sign({_id: user._id.toHexString(), access}, process.env.JWT_SECRET).toString();
 
-  user.tokens = {access, token};
+  user.tokens.push({access, token});
 
   return user.save().then(() => {
     return token;
